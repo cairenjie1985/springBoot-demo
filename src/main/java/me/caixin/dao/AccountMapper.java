@@ -2,16 +2,19 @@ package me.caixin.dao;
 
 import me.caixin.entity.AccountEntity;
 import org.apache.ibatis.annotations.*;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
  * Created by roy on 2017/9/2.
  */
+@Repository
 public interface AccountMapper {
 
     @Select("SELECT * FROM account")
     @Results({
+            @Result(property = "userName",column = "user_name"),
             @Result(property = "userSex",  column = "user_sex"),
             @Result(property = "nickName", column = "nick_name")
     })
@@ -19,10 +22,11 @@ public interface AccountMapper {
 
     @Select("SELECT * FROM account WHERE id = #{id}")
     @Results({
+            @Result(property = "userName",column = "user_name"),
             @Result(property = "userSex",  column = "user_sex"),
             @Result(property = "nickName", column = "nick_name")
     })
-    AccountEntity getOne(Long id);
+    AccountEntity getOne(int id);
 
     @Insert("INSERT INTO account(userName,passWord,user_sex) VALUES(#{userName}, #{passWord}, #{userSex})")
     void insert(AccountEntity user);
@@ -34,5 +38,5 @@ public interface AccountMapper {
     void delete(Long id);
 
 
-    AccountEntity selectAccountByName(@Param("userName") String userName);
+    List<AccountEntity> selectAccountByName(@Param("userName") String userName);
 }

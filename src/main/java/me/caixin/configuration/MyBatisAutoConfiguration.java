@@ -28,7 +28,7 @@ import java.util.Properties;
 
 @Configuration
 @EnableTransactionManagement
-@MapperScan("me.caixin.dao")
+@MapperScan(basePackages ={"me.caixin.dao"} )
 public class MyBatisAutoConfiguration  implements EnvironmentAware {
 
     private Environment environment;
