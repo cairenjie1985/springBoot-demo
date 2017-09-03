@@ -16,6 +16,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -26,6 +27,7 @@ import java.util.Properties;
  */
 
 @Configuration
+@EnableTransactionManagement
 @MapperScan("me.caixin.dao")
 public class MyBatisAutoConfiguration  implements EnvironmentAware {
 
