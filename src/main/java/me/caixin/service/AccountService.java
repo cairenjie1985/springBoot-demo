@@ -31,4 +31,8 @@ public class AccountService {
         return accountMapper.selectAccountByName(accountQueryDTO);
     }
 
+    public AccountEntity getAccount(int id){
+        return accountMapper.getOne(id);
+    }
+
 }

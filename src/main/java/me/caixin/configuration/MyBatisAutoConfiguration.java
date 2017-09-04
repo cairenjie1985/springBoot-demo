@@ -24,11 +24,10 @@ import java.util.Properties;
 /**
  * Project Name: spring-boot-demo
  * Package Name: me.caixin.configuration
- * Function:  初始化问题
+ * Function: myBatis 配置
  * User: roy.cai
  * Date: 2017-09-04
  */
-
 @Configuration
 @EnableTransactionManagement
 @MapperScan(basePackages ={"me.caixin.dao"} )
