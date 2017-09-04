@@ -1,7 +1,7 @@
 package me.caixin.configuration;
 
-import com.alibaba.druid.pool.DruidDataSource;
 import com.github.pagehelper.PageHelper;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -23,7 +23,11 @@ import java.util.Arrays;
 import java.util.Properties;
 
 /**
- * Created by roy on 2017/9/2.
+ * Project Name: spring-boot-demo
+ * Package Name: me.caixin.configuration
+ * Function:  初始化问题
+ * User: roy.cai
+ * Date: 2017-09-04
  */
 
 @Configuration
@@ -40,8 +44,8 @@ public class MyBatisAutoConfiguration  implements EnvironmentAware {
     }
 
     //注册dataSource
-    @Bean(initMethod = "init", destroyMethod = "close")
-    public DruidDataSource dataSource() throws SQLException {
+    @Bean(destroyMethod = "close")
+    public BasicDataSource dataSource() throws SQLException {
         if (StringUtils.isEmpty(propertyResolver.getProperty("url"))) {
             System.out.println("Your database connection pool configuration is incorrect!"
                     + " Please check your Spring profile, current profiles are:"
@@ -49,25 +53,23 @@ public class MyBatisAutoConfiguration  implements EnvironmentAware {
             throw new ApplicationContextException(
                     "Database connection pool is not configured correctly");
         }
-        DruidDataSource druidDataSource = new DruidDataSource();
-        druidDataSource.setDriverClassName(propertyResolver.getProperty("driver-class-name"));
-        druidDataSource.setUrl(propertyResolver.getProperty("url"));
-        druidDataSource.setUsername(propertyResolver.getProperty("username"));
-        druidDataSource.setPassword(propertyResolver.getProperty("password"));
-        druidDataSource.setInitialSize(Integer.parseInt(propertyResolver.getProperty("initialSize")));
-        druidDataSource.setMinIdle(Integer.parseInt(propertyResolver.getProperty("minIdle")));
-        druidDataSource.setMaxActive(Integer.parseInt(propertyResolver.getProperty("maxActive")));
-        druidDataSource.setMaxWait(Integer.parseInt(propertyResolver.getProperty("maxWait")));
-        druidDataSource.setTimeBetweenEvictionRunsMillis(Long.parseLong(propertyResolver.getProperty("timeBetweenEvictionRunsMillis")));
-        druidDataSource.setMinEvictableIdleTimeMillis(Long.parseLong(propertyResolver.getProperty("minEvictableIdleTimeMillis")));
-        druidDataSource.setValidationQuery(propertyResolver.getProperty("validationQuery"));
-        druidDataSource.setTestWhileIdle(Boolean.parseBoolean(propertyResolver.getProperty("testWhileIdle")));
-        druidDataSource.setTestOnBorrow(Boolean.parseBoolean(propertyResolver.getProperty("testOnBorrow")));
-        druidDataSource.setTestOnReturn(Boolean.parseBoolean(propertyResolver.getProperty("testOnReturn")));
-        druidDataSource.setPoolPreparedStatements(Boolean.parseBoolean(propertyResolver.getProperty("poolPreparedStatements")));
-        druidDataSource.setMaxPoolPreparedStatementPerConnectionSize(Integer.parseInt(propertyResolver.getProperty("maxPoolPreparedStatementPerConnectionSize")));
-        druidDataSource.setFilters(propertyResolver.getProperty("filters"));
-        return druidDataSource;
+        BasicDataSource dataSource = new BasicDataSource();
+        dataSource.setDriverClassName(propertyResolver.getProperty("driver-class-name"));
+        dataSource.setUrl(propertyResolver.getProperty("url"));
+        dataSource.setUsername(propertyResolver.getProperty("username"));
+        dataSource.setPassword(propertyResolver.getProperty("password"));
+        dataSource.setInitialSize(Integer.parseInt(propertyResolver.getProperty("initialSize")));
+        dataSource.setMaxTotal(Integer.parseInt(propertyResolver.getProperty("maxTotal")));
+        dataSource.setMaxIdle(Integer.parseInt(propertyResolver.getProperty("maxIdle")));
+        dataSource.setMinIdle(Integer.parseInt(propertyResolver.getProperty("minIdle")));
+        dataSource.setTimeBetweenEvictionRunsMillis(Long.parseLong(propertyResolver.getProperty("timeBetweenEvictionRunsMillis")));
+        dataSource.setMinEvictableIdleTimeMillis(Long.parseLong(propertyResolver.getProperty("minEvictableIdleTimeMillis")));
+        dataSource.setValidationQuery(propertyResolver.getProperty("validationQuery"));
+        dataSource.setTestWhileIdle(Boolean.parseBoolean(propertyResolver.getProperty("testWhileIdle")));
+        dataSource.setTestOnBorrow(Boolean.parseBoolean(propertyResolver.getProperty("testOnBorrow")));
+        dataSource.setTestOnReturn(Boolean.parseBoolean(propertyResolver.getProperty("testOnReturn")));
+        dataSource.setRemoveAbandonedOnBorrow(Boolean.parseBoolean(propertyResolver.getProperty("removeAbandonedOnBorrow")));
+        return dataSource;
     }
 
     @Bean public SqlSessionFactory sqlSessionFactory() throws Exception {
@@ -90,6 +92,5 @@ public class MyBatisAutoConfiguration  implements EnvironmentAware {
     @Bean public PlatformTransactionManager transactionManager() throws SQLException {
         return new DataSourceTransactionManager(dataSource());
     }
-
 
 }
