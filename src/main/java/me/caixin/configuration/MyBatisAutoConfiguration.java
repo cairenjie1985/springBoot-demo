@@ -1,25 +1,24 @@
 package me.caixin.configuration;
 
+import com.alibaba.druid.pool.DruidDataSource;
 import com.github.pagehelper.PageHelper;
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContextException;
-import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import javax.validation.constraints.NotNull;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Properties;
 
 /**
@@ -33,44 +32,41 @@ import java.util.Properties;
 @Configuration
 @EnableTransactionManagement
 @MapperScan(basePackages ={"me.caixin.dao"} )
-public class MyBatisAutoConfiguration  implements EnvironmentAware {
+@ConfigurationProperties(prefix = "datasource")
+@PropertySource(value = "classpath:/config/datasource.properties")
+public class MyBatisAutoConfiguration {
 
-    private Environment environment;
-    private RelaxedPropertyResolver propertyResolver;
-    @Override
-    public void setEnvironment(Environment environment) {
-        this.environment = environment;
-        this.propertyResolver = new RelaxedPropertyResolver(environment,"spring.datasource.");
+    public MyBatisAutoConfiguration(){
+
     }
 
     //注册dataSource
-    @Bean(destroyMethod = "close")
-    public BasicDataSource dataSource() throws SQLException {
-        if (StringUtils.isEmpty(propertyResolver.getProperty("url"))) {
+    @Bean(name = "dataSource",destroyMethod = "close",initMethod = "init")
+    public DruidDataSource dataSource() throws SQLException {
+        if (StringUtils.isEmpty(url)) {
             System.out.println("Your database connection pool configuration is incorrect!"
-                    + " Please check your Spring profile, current profiles are:"
-                    + Arrays.toString(environment.getActiveProfiles()));
+                    + " Please check your Spring profile"
+                   );
             throw new ApplicationContextException(
                     "Database connection pool is not configured correctly");
         }
-        BasicDataSource dataSource = new BasicDataSource();
-        dataSource.setDriverClassName(propertyResolver.getProperty("driver-class-name"));
-        dataSource.setUrl(propertyResolver.getProperty("url"));
-        dataSource.setUsername(propertyResolver.getProperty("username"));
-        dataSource.setPassword(propertyResolver.getProperty("password"));
-        dataSource.setInitialSize(Integer.parseInt(propertyResolver.getProperty("initialSize")));
-        dataSource.setMaxTotal(Integer.parseInt(propertyResolver.getProperty("maxTotal")));
-        dataSource.setMaxIdle(Integer.parseInt(propertyResolver.getProperty("maxIdle")));
-        dataSource.setMinIdle(Integer.parseInt(propertyResolver.getProperty("minIdle")));
-        dataSource.setTimeBetweenEvictionRunsMillis(Long.parseLong(propertyResolver.getProperty("timeBetweenEvictionRunsMillis")));
-        dataSource.setMinEvictableIdleTimeMillis(Long.parseLong(propertyResolver.getProperty("minEvictableIdleTimeMillis")));
-        dataSource.setValidationQuery(propertyResolver.getProperty("validationQuery"));
-        dataSource.setTestWhileIdle(Boolean.parseBoolean(propertyResolver.getProperty("testWhileIdle")));
-        dataSource.setTestOnBorrow(Boolean.parseBoolean(propertyResolver.getProperty("testOnBorrow")));
-        dataSource.setTestOnReturn(Boolean.parseBoolean(propertyResolver.getProperty("testOnReturn")));
-        dataSource.setRemoveAbandonedOnBorrow(Boolean.parseBoolean(propertyResolver.getProperty("removeAbandonedOnBorrow")));
+        DruidDataSource dataSource = new DruidDataSource();
+        dataSource.setDriverClassName(driverClassName);
+        dataSource.setUrl(url);
+        dataSource.setUsername(userName);
+        dataSource.setPassword(password);
+        dataSource.setInitialSize(initialSize);
+        dataSource.setMaxActive(maxActive);
+        dataSource.setMinIdle(minIdle);
+        dataSource.setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
+        dataSource.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
+        dataSource.setValidationQuery(validationQuery);
+        dataSource.setTestWhileIdle(testWhileIdle);
+        dataSource.setTestOnBorrow(testOnBorrow);
+        dataSource.setTestOnReturn(testOnReturn);
         return dataSource;
     }
+
 
     @Bean public SqlSessionFactory sqlSessionFactory() throws Exception {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
@@ -89,8 +85,154 @@ public class MyBatisAutoConfiguration  implements EnvironmentAware {
         sqlSessionFactoryBean.setMapperLocations(resolver.getResources("classpath:/me/caixin/dao/mapping/**/*.xml"));
         return sqlSessionFactoryBean.getObject();
     }
+
     @Bean public PlatformTransactionManager transactionManager() throws SQLException {
         return new DataSourceTransactionManager(dataSource());
     }
+
+    public String getDriverClassName() {
+        return driverClassName;
+    }
+
+    public void setDriverClassName(String driverClassName) {
+        this.driverClassName = driverClassName;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public int getInitialSize() {
+        return initialSize;
+    }
+
+    public void setInitialSize(int initialSize) {
+        this.initialSize = initialSize;
+    }
+
+    public int getMaxActive() {
+        return maxActive;
+    }
+
+    public void setMaxActive(int maxActive) {
+        this.maxActive = maxActive;
+    }
+
+    public int getMinIdle() {
+        return minIdle;
+    }
+
+    public void setMinIdle(int minIdle) {
+        this.minIdle = minIdle;
+    }
+
+    public Long getMaxWait() {
+        return maxWait;
+    }
+
+    public void setMaxWait(Long maxWait) {
+        this.maxWait = maxWait;
+    }
+
+    public Long getTimeBetweenEvictionRunsMillis() {
+        return timeBetweenEvictionRunsMillis;
+    }
+
+    public void setTimeBetweenEvictionRunsMillis(Long timeBetweenEvictionRunsMillis) {
+        this.timeBetweenEvictionRunsMillis = timeBetweenEvictionRunsMillis;
+    }
+
+    public Long getMinEvictableIdleTimeMillis() {
+        return minEvictableIdleTimeMillis;
+    }
+
+    public void setMinEvictableIdleTimeMillis(Long minEvictableIdleTimeMillis) {
+        this.minEvictableIdleTimeMillis = minEvictableIdleTimeMillis;
+    }
+
+    public String getValidationQuery() {
+        return validationQuery;
+    }
+
+    public void setValidationQuery(String validationQuery) {
+        this.validationQuery = validationQuery;
+    }
+
+    public boolean isTestWhileIdle() {
+        return testWhileIdle;
+    }
+
+    public void setTestWhileIdle(boolean testWhileIdle) {
+        this.testWhileIdle = testWhileIdle;
+    }
+
+    public boolean isTestOnBorrow() {
+        return testOnBorrow;
+    }
+
+    public void setTestOnBorrow(boolean testOnBorrow) {
+        this.testOnBorrow = testOnBorrow;
+    }
+
+    public boolean isTestOnReturn() {
+        return testOnReturn;
+    }
+
+    public void setTestOnReturn(boolean testOnReturn) {
+        this.testOnReturn = testOnReturn;
+    }
+
+
+    private String driverClassName ;
+
+    @NotNull
+    private String url;
+
+    @NotNull
+    private String userName;
+
+    @NotNull
+    private String password;
+
+    private int initialSize;
+
+    private int maxActive;
+
+    private int minIdle;
+
+    private Long maxWait;
+
+    private Long timeBetweenEvictionRunsMillis;
+
+    private Long minEvictableIdleTimeMillis;
+
+    private String validationQuery;
+
+    private boolean testWhileIdle;
+
+    private boolean testOnBorrow;
+
+    private boolean testOnReturn;
+
 
 }
