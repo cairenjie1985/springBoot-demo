@@ -1,5 +1,6 @@
 package me.caixin.controller;
 
+import me.caixin.dto.AccountQueryDTO;
 import me.caixin.entity.AccountEntity;
 import me.caixin.service.AccountService;
 import org.apache.commons.lang.StringUtils;
@@ -39,7 +40,9 @@ public class IndexController {
 
     @RequestMapping("/getAccount/{name}")
     public @ResponseBody List<AccountEntity> getAccount(@PathVariable String name){
-        return accountService.selectAccountByName(name);
+        AccountQueryDTO accountQueryDTO = new AccountQueryDTO();
+        accountQueryDTO.setUserName(name);
+        return accountService.selectAccountByName(accountQueryDTO);
     }
 
 }

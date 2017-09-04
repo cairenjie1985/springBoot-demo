@@ -1,6 +1,7 @@
 package me.caixin.service;
 
 import me.caixin.dao.AccountMapper;
+import me.caixin.dto.AccountQueryDTO;
 import me.caixin.entity.AccountEntity;
 import org.springframework.stereotype.Service;
 
@@ -26,8 +27,8 @@ public class AccountService {
       return name;
     }
 
-    public List<AccountEntity> selectAccountByName(String name){
-        return accountMapper.selectAccountByName(name);
+    public List<AccountEntity> selectAccountByName(AccountQueryDTO accountQueryDTO){
+        return accountMapper.selectAccountByName(accountQueryDTO);
     }
 
 }

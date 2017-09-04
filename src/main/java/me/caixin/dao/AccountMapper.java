@@ -1,5 +1,6 @@
 package me.caixin.dao;
 
+import me.caixin.dto.AccountQueryDTO;
 import me.caixin.entity.AccountEntity;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
@@ -38,5 +39,5 @@ public interface AccountMapper {
     void delete(Long id);
 
 
-    List<AccountEntity> selectAccountByName(@Param("userName") String userName);
+    List<AccountEntity> selectAccountByName(AccountQueryDTO accountQueryDTO);
 }

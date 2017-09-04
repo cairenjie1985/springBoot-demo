@@ -3,7 +3,11 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="me.caixin.dao.AccountMapper">
-    
+
+    <sql id="Base_Column_List" >
+        id, user_name, password, user_sex, nick_name
+    </sql>
+
     <resultMap id="accountResult" type="me.caixin.entity.AccountEntity">
         <id column="id" property="id" jdbcType="INTEGER" />
         <result column="user_name" property="userName" jdbcType="VARCHAR" />
@@ -12,8 +16,11 @@
         <result column="nick_name" property="nickName" jdbcType="VARCHAR" />
     </resultMap>
     
-    <select id="selectAccountByName" resultMap="accountResult">
-        select * from account where name LIKE '%#{userName}'
+    <select id="selectAccountByName" parameterType="me.caixin.dto.AccountQueryDTO" resultMap="accountResult">
+        select
+        <include refid="Base_Column_List"/>
+        from account
+        where user_name like concat('%',#{userName},'%')
     </select>
 
 </mapper>
