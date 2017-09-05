@@ -5,3 +5,4 @@
 4. redis 
 5. JUnit4
 6. session
+7. 日志
